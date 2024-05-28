@@ -183,7 +183,7 @@ def hitung_kebutuhan_nutrisi(meal_id, AKEi, penyakit_input_list, jenis_kelamin):
     
     return np.array([[kebutuhan_kalori, protein, lemak, lemak_jenuh, lemak_tidak_jenuh_ganda, lemak_tidak_jenuh_tunggal, karbohidrat, kolesterol, gula, serat, garam, kalium]])
 
-def rekomendasi_makanan(dataset_mealtime, nutrisi_dibutuhkan, user_allergies):
+def rekomendasi_makanan_knn_all(dataset_mealtime, nutrisi_dibutuhkan, user_allergies):
     # Mengambil fitur nutrisi dari subset dataset
     nutrisi_columns = ['Energi (kkal)', 'Protein (g)', 'Lemak (g)', 'Lemak Jenuh (g)', 'Lemak tak Jenuh Ganda (g)', 'Lemak tak Jenuh Tunggal (g)', 'Karbohidrat (g)', 'Kolesterol (mg)', 'Gula (g)', 'Serat (g)', 'Sodium (mg)', 'Kalium (mg)']
     
