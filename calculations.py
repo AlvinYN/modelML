@@ -29,35 +29,14 @@ def hitung_berat_badan_ideal(Tb):
     return Bi
 
 # Function to calculate basic calorie needs
-def hitung_AKEi_umur(Bi, jenis_kelamin, umur):
-    print(f"Calculating AKEi for Bi: {Bi}, gender: {jenis_kelamin}, age: {umur}")
-    if 20 <= umur <= 29:
-        if jenis_kelamin.lower() == "laki-laki":
-            AKEi = (15.3 * Bi + 679) * 1.78
-        elif jenis_kelamin.lower() == "perempuan":
-            AKEi = (14.7 * Bi + 496) * 1.64
-        else:
-            print("Invalid gender")
-            return "Jenis kelamin tidak valid"
-    elif 30 <= umur <= 59:
-        if jenis_kelamin.lower() == "laki-laki":
-            AKEi = (11.6 * Bi + 879) * 1.78
-        elif jenis_kelamin.lower() == "perempuan":
-            AKEi = (8.7 * Bi + 829) * 1.64
-        else:
-            print("Invalid gender")
-            return "Jenis kelamin tidak valid"
-    elif umur >= 60:
-        if jenis_kelamin.lower() == "laki-laki":
-            AKEi = (13.5 * Bi + 487) * 1.78
-        elif jenis_kelamin.lower() == "perempuan":
-            AKEi = (13.5 * Bi + 596) * 1.64
-        else:
-            print("Invalid gender")
-            return "Jenis kelamin tidak valid"
+def hitung_AKEi_umur(Bb, Tb, jenis_kelamin, umur):
+    if jenis_kelamin.lower() == "laki-laki":
+        AKEi = (10 * Bb) + (6.25 * Tb) - (5 * umur) + 5
+    elif jenis_kelamin.lower() == "perempuan":
+        AKEi = (10 * Bb) + (6.25 * Tb) - (5 * umur) - 161
     else:
-        print("Invalid age")
-        return "Umur tidak valid"
+        raise ValueError("Jenis kelamin tidak valid")
+    return AKEi
 
     print(f"Calculated AKEi: {AKEi}")
     return AKEi
