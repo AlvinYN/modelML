@@ -83,7 +83,7 @@ def api_rekomendasi():
         
         print(f"Nutrisi yang dibutuhkan untuk {meal_name}: {nutrisi_dibutuhkan}")
         
-        rekomendasi = rekomendasi_makanan_knn_all(dataset_mealtime, nutrisi_dibutuhkan, user_allergies)
+        rekomendasi = rekomendasi_makanan_knn_all(dataset_mealtime, nutrisi_dibutuhkan, user_allergies, penyakit_input)
         response_data[meal_name] = [{"Recipe ID": int(recipe_id)} for recipe_id in rekomendasi['Recipe ID']]
         
         print(f"Rekomendasi untuk {meal_name}: {response_data[meal_name]}")
