@@ -14,6 +14,33 @@ allergy_categories = {
     "Seafood": ["Salmon", "Tuna", "Cod", "Trout", "Mackerel", "Sarden", "Sardine", "Anchovy", "Haddock", "Herring", "Halibut", "Udang", "Shrimp", "Lobster", "Kepiting", "Crab", "Kerang", "Clams", "Tiram", "Oysters", "Cumi-cumi", "Squid", "Gurita", "Octopus", "Kerang Simping", "Scallops", "Kerang Hijau", "Mussels", "Kerang Abalon", "Abalone"]
 }
 
+# Define food restrictions for diseases
+makanan_tidak_boleh_kolesterol = [
+    "Kuning telur", "Jeroan (seperti hati, ginjal)", "Otak hewan (sapi, babi)", "Cumi-cumi",
+    "Produk susu penuh lemak (mentega, krim)", "Daging berlemak dan gajih (sapi, kambing)",
+    "Kerang putih/tiram", "Santan", "Margarin/mentega", "Kue tar", "Es krim", "Sosis", "Makanan yang digoreng"
+]
+
+makanan_tidak_boleh_hipertensi = [
+    "Roti dengan garam dapur", "Biskuit dengan garam dapur", "Kue dengan garam dapur",
+    "Makanan dengan baking powder", "Makanan dengan soda kue", "Otak", "Ginjal", "Lidah", "Sardin",
+    "Daging yang diawetkan dengan garam dapur", "Ikan yang diawetkan dengan garam dapur", "Susu yang diawetkan dengan garam dapur",
+    "Telur yang diawetkan dengan garam dapur", "Daging asap", "Ham", "Dendeng", "Abon", "Keju", "Ikan asin",
+    "Ikan kaleng", "Kornet", "Ebi", "Udang kering", "Telur asin", "Telur pindang", "Keju dengan garam dapur",
+    "Kacang tanah dengan garam dapur", "Kacang-kacangan dengan garam dapur", "Sayuran dalam kaleng", "Sawi asin", 
+    "Asinan", "Acar", "Buah kaleng", "Margarin biasa", "Mentega biasa", "Minuman ringan", "Garam dapur", 
+    "Baking powder", "Soda kue", "Vetsin", "Kecap", "Terasi", "Kaldu instan", "Saus tomat", "Petis", "Tauco",
+    "Lemak dari hewan", "Keju", "Mentega", "Margarin", "Minyak kelapa", "Kuning telur", "Susu", 
+    "Pangan hewani tinggi trigliserida", "Pangan nabati tinggi trigliserida"
+]
+
+makanan_tidak_boleh_diabetes = [
+    "Gula pasir", "Gula jawa", "Sirup", "Selai", "Jeli", "Buah yang diawetkan dengan gula",
+    "Susu kental manis", "Minuman botol ringan", "Es krim", "Kue manis", "Dodol", "Cake", "Tart",
+    "Cake", "Makanan siap saji (fast food)", "Goreng-gorengan", "Ikan asin", "Telur asin", 
+    "Makanan yang diawetkan", "Makanan yang banyak mengandung MSG"
+]
+
 # Function to check for allergies in a recipe
 def check_allergies(ingredients, user_allergies):
     for allergy_category in user_allergies:
@@ -21,6 +48,21 @@ def check_allergies(ingredients, user_allergies):
         for item in allergy_list:
             if item.lower() in ingredients.lower():
                 return True
+    return False
+
+# Function to check for food restrictions in a recipe
+def check_food_restrictions(ingredients, penyakit_input):
+    restricted_foods = set()
+    if 'Kolesterol' in penyakit_input:
+        restricted_foods.update(makanan_tidak_boleh_kolesterol)
+    if 'Hipertensi' in penyakit_input:
+        restricted_foods.update(makanan_tidak_boleh_hipertensi)
+    if 'Diabetes' in penyakit_input:
+        restricted_foods.update(makanan_tidak_boleh_diabetes)
+    
+    for item in restricted_foods:
+        if item.lower() in ingredients.lower():
+            return True
     return False
 
 # Function to calculate ideal body weight
@@ -37,10 +79,6 @@ def hitung_AKEi_umur(Bb, Tb, jenis_kelamin, umur):
     else:
         raise ValueError("Jenis kelamin tidak valid")
     return AKEi
-
-    print(f"Calculated AKEi: {AKEi}")
-    return AKEi
-
 
 # Function to calculate the nutritional needs factor based on mealtime
 def hitung_kebutuhan_faktor(meal_id):
@@ -162,7 +200,7 @@ def hitung_kebutuhan_nutrisi(meal_id, AKEi, penyakit_input_list, jenis_kelamin):
     
     return np.array([[kebutuhan_kalori, protein, lemak, lemak_jenuh, lemak_tidak_jenuh_ganda, lemak_tidak_jenuh_tunggal, karbohidrat, kolesterol, gula, serat, garam, kalium]])
 
-def rekomendasi_makanan_knn_all(dataset_mealtime, nutrisi_dibutuhkan, user_allergies):
+def rekomendasi_makanan_knn_all(dataset_mealtime, nutrisi_dibutuhkan, user_allergies, penyakit_input):
     # Mengambil fitur nutrisi dari subset dataset
     nutrisi_columns = ['Energi (kkal)', 'Protein (g)', 'Lemak (g)', 'Lemak Jenuh (g)', 'Lemak tak Jenuh Ganda (g)', 'Lemak tak Jenuh Tunggal (g)', 'Karbohidrat (g)', 'Kolesterol (mg)', 'Gula (g)', 'Serat (g)', 'Sodium (mg)', 'Kalium (mg)']
     
@@ -196,6 +234,7 @@ def rekomendasi_makanan_knn_all(dataset_mealtime, nutrisi_dibutuhkan, user_aller
     print(rekomendasi[['Recipe ID', 'Nama Resep', 'Meal ID', 'Ingredients']])
     
     rekomendasi_filtered = rekomendasi[~rekomendasi['Ingredients'].apply(check_allergies, user_allergies=user_allergies)]
+    rekomendasi_filtered = rekomendasi_filtered[~rekomendasi_filtered['Ingredients'].apply(check_food_restrictions, penyakit_input=penyakit_input)]
     
     # Debugging untuk melihat hasil filter alergi
     print(f"Rekomendasi setelah filter alergi: {len(rekomendasi_filtered)} resep")
