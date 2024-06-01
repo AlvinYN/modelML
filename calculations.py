@@ -151,6 +151,22 @@ def hitung_kebutuhan_nutrisi(meal_id, AKEi, penyakit_input_list, jenis_kelamin):
         kalium = faktor * 3500
         return np.array([[kebutuhan_kalori, protein, lemak, lemak_jenuh, lemak_tidak_jenuh_ganda, lemak_tidak_jenuh_tunggal, karbohidrat, kolesterol, gula, serat, garam, kalium]])
     
+    if 'Zone' in penyakit_input:  # Asumsi 'Zone' ditambahkan dalam input jika pengguna mengikuti diet Zone
+        kebutuhan_kalori = faktor * AKEi
+        protein = 0.3 * kebutuhan_kalori / 4  # 30% kalori dari protein, setiap gram protein = 4 kalori
+        lemak = 0.3 * kebutuhan_kalori / 9  # 30% kalori dari lemak, setiap gram lemak = 9 kalori
+        lemak_jenuh = 0.05 * lemak / 9
+        lemak_tidak_jenuh_ganda = 0.1 * lemak
+        lemak_tidak_jenuh_tunggal = lemak - lemak_jenuh - lemak_tidak_jenuh_ganda
+        karbohidrat = 0.4 * kebutuhan_kalori / 4  # 40% kalori dari karbohidrat, setiap gram karbo = 4 kalori
+        kolesterol = faktor * 200  # Kolesterol bisa disesuaikan berdasarkan faktor risiko lain
+        gula = 0.025 * kebutuhan_kalori  # Gula tetap dijaga rendah
+        serat = faktor * 30  # Serat tinggi untuk mendukung kesehatan pencernaan dan kardiovaskular
+        garam = faktor * 1500  # Pembatasan garam untuk mendukung kesehatan jantung
+        kalium = faktor * 3500  # Kalium tinggi untuk keseimbangan elektrolit
+        return np.array([[kebutuhan_kalori, protein, lemak, lemak_jenuh, lemak_tidak_jenuh_ganda, lemak_tidak_jenuh_tunggal, karbohidrat, kolesterol, gula, serat, garam, kalium]])
+
+    
     if 'Diabetes' in penyakit_input:
         kebutuhan_kalori = faktor * AKEi
         protein = 0.125 * kebutuhan_kalori / 4
@@ -233,11 +249,18 @@ def rekomendasi_makanan_knn_all(dataset_mealtime, nutrisi_dibutuhkan, user_aller
     print(f"Rekomendasi awal dari k-NN: {len(rekomendasi)} resep")
     print(rekomendasi[['Recipe ID', 'Nama Resep', 'Meal ID', 'Ingredients']])
     
-    rekomendasi_filtered = rekomendasi[~rekomendasi['Ingredients'].apply(check_allergies, user_allergies=user_allergies)]
-    rekomendasi_filtered = rekomendasi_filtered[~rekomendasi_filtered['Ingredients'].apply(check_food_restrictions, penyakit_input=penyakit_input)]
+    # Jika user_allergies tidak kosong, lakukan pemfilteran berdasarkan alergi
+    if user_allergies:
+        rekomendasi_filtered = rekomendasi[~rekomendasi['Ingredients'].apply(lambda x: check_allergies(x, user_allergies))]
+    else:
+        rekomendasi_filtered = rekomendasi
+
+    # Filter berdasarkan restriksi penyakit
+    rekomendasi_filtered = rekomendasi_filtered[~rekomendasi_filtered['Ingredients'].apply(lambda x: check_food_restrictions(x, penyakit_input))]
     
-    # Debugging untuk melihat hasil filter alergi
-    print(f"Rekomendasi setelah filter alergi: {len(rekomendasi_filtered)} resep")
+    # Debugging untuk melihat hasil filter alergi dan penyakit
+    print(f"Rekomendasi setelah filter: {len(rekomendasi_filtered)} resep")
     print(rekomendasi_filtered[['Recipe ID', 'Nama Resep', 'Meal ID', 'Ingredients']])
     
     return rekomendasi_filtered
+
