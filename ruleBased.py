@@ -6,30 +6,25 @@ from sklearn.preprocessing import MinMaxScaler
 dataset_path = "newestUpdate_ConstrainsRecipe.csv"
 dataset = pd.read_csv(dataset_path)
 
-# Function to calculate ideal body weight
 def hitung_berat_badan_ideal(Tb):
-    Bi = (Tb - 100) - (0.1 * (Tb - 100))
-    return Bi
+    return (Tb - 100) - (0.1 * (Tb - 100))
 
-# Function to calculate basic calorie needs
 def hitung_AKEi_umur(Bb, Tb, jenis_kelamin, umur):
     if jenis_kelamin.lower() == "laki-laki":
-        AKEi = (10 * Bb) + (6.25 * Tb) - (5 * umur) + 5
+        return (10 * Bb) + (6.25 * Tb) - (5 * umur) + 5
     elif jenis_kelamin.lower() == "perempuan":
-        AKEi = (10 * Bb) + (6.25 * Tb) - (5 * umur) - 161
+        return (10 * Bb) + (6.25 * Tb) - (5 * umur) - 161
     else:
         raise ValueError("Jenis kelamin tidak valid")
-    return AKEi
 
-# Function to calculate the nutritional needs factor based on mealtime
 def hitung_kebutuhan_faktor(meal_id):
     faktor_map = {1: 0.25, 2: 0.40, 3: 0.35}
     return faktor_map[meal_id]
 
-# Function to calculate nutritional needs based on mealtime, diseases, and basic calorie intake
 def hitung_kebutuhan_nutrisi(meal_id, AKEi, penyakit_input_list, jenis_kelamin):
     faktor = hitung_kebutuhan_faktor(meal_id)
     penyakit_input = set(penyakit_input_list)
+    # nutrisi = np.zeros(12)  # Pastikan ini memiliki 12 elemen
     kebutuhan_kalori = protein = lemak = lemak_jenuh = lemak_tidak_jenuh_ganda = lemak_tidak_jenuh_tunggal = karbohidrat = kolesterol = gula = serat = garam = kalium = 0
 
     if {'Diabetes', 'Hipertensi', 'Kolesterol'}.issubset(penyakit_input):
@@ -186,10 +181,10 @@ def hitung_kebutuhan_nutrisi(meal_id, AKEi, penyakit_input_list, jenis_kelamin):
         return nutrisi
     else:
         return ValueError("Penyakit tidak valid")
-
+    
 def rekomendasi_makanan(dataset, penyakit_input, alergi_input, AKEi, jenis_kelamin):
     rekomendasi_akhir = pd.DataFrame()
-
+    
     # Filter resep yang sesuai dengan penyakit dan alergi (nilai 0)
     for penyakit in penyakit_input:
         dataset = dataset[dataset[penyakit] == 0]
@@ -232,19 +227,8 @@ def rekomendasi_makanan(dataset, penyakit_input, alergi_input, AKEi, jenis_kelam
         print(rekomendasi[['Nama Resep', 'Meal ID', 'Protein (g)', 'Lemak (g)', 'Karbohidrat (g)']])
         
         rekomendasi_akhir = pd.concat([rekomendasi_akhir, rekomendasi])
-    
+
     return rekomendasi_akhir
 
-# Contoh penggunaan
-# Tentukan input pengguna
-penyakit_input = 'Kolesterol'.split(",")
-alergi_input = 'Eggs'.split(",")
-jenis_kelamin = "laki-laki"
-AKEi = hitung_AKEi_umur(Bb=70, Tb=170, jenis_kelamin=jenis_kelamin, umur=30)
 
-# Panggil fungsi rekomendasi_makanan
-rekomendasi_resep = rekomendasi_makanan(dataset, penyakit_input, alergi_input, AKEi, jenis_kelamin)
-
-# Debugging untuk melihat hasil akhir rekomendasi
-print(f"Total rekomendasi: {len(rekomendasi_resep)} resep")
-print(rekomendasi_resep[['Nama Resep', 'Meal ID', 'Protein (g)', 'Lemak (g)', 'Karbohidrat (g)']])
+# Simpan file ruleBased.py ini dan gunakan fungsi-fungsinya di app.py seperti contoh di atas
